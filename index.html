@@ -5,126 +5,315 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arma tu Antojo 🍰</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Quicksand', sans-serif; }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar { transition: width 0.4s ease; }
+        .error-field { border-color: #f87171 !important; background-color: #fef2f2 !important; }
+        
+        /* Personalización de SweetAlert para que combine con el rosa */
+        .swal2-styled.swal2-confirm {
+            background-color: #ec4899 !important; /* pink-500 */
+        }
     </style>
 </head>
 <body class="bg-pink-50 min-h-screen p-4 md:p-8">
 
-    <div class="max-w-lg mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-pink-100">
-        <div class="bg-pink-400 p-6 text-white text-center">
+    <div class="max-w-lg mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-pink-100">
+        
+        <div class="bg-pink-400 p-6 text-white text-center relative">
             <h1 class="text-2xl font-bold">Arma tu Antojo 🍰</h1>
-            <p class="text-pink-50 mt-2 text-sm">Pensamos en tu comodidad 💕 Haz tu pedido fácilmente y con todos los detalles claros.</p>
+            <p class="text-pink-50 text-xs mt-1">💕 Dulzura personalizada a tu gusto</p>
+            
+            <div class="absolute bottom-0 left-0 w-full h-1.5 bg-pink-600/20">
+                <div id="progressBar" class="progress-bar h-full bg-white w-1/3"></div>
+            </div>
         </div>
 
-        <form id="orderForm" class="p-6 space-y-6">
+        <form id="orderForm" class="p-6 md:p-8">
             
-            <div class="space-y-4">
-                <h2 class="text-pink-600 font-bold flex items-center gap-2">
-                    <span>🧁</span> Empecemos con tus datos
-                </h2>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">¿A nombre de quién preparamos este pedido? 💖 *</label>
-                    <input type="text" id="nombre" required class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none" placeholder="Tu nombre">
+            <div class="step active" id="step1">
+                <div class="text-center mb-6">
+                    <span class="bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Paso 1 de 3</span>
+                    <h2 class="text-xl font-bold text-gray-800 mt-2">¿Con quién hablamos?</h2>
                 </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">¿Cómo podemos contactarte? 📱 *</label>
-                    <input type="tel" id="whatsapp" required class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none" placeholder="WhatsApp / Celular">
-                </div>
-            </div>
-
-            <hr class="border-pink-50">
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">¿Cómo prefieres recibir tu pedido? 🚚 *</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="entrega" value="Personalmente" required class="text-pink-500 focus:ring-pink-400">
-                            <span class="text-gray-600">Personalmente</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="entrega" value="Domicilio" class="text-pink-500 focus:ring-pink-400">
-                            <span class="text-gray-600">Domicilio</span>
-                        </label>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Tu nombre 💖 *</label>
+                        <input type="text" id="nombre" data-required="true" placeholder="Escribe tu nombre" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 focus:outline-none bg-pink-50/30 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">WhatsApp 📱 *</label>
+                        <input type="tel" id="whatsapp" data-required="true" placeholder="Número de contacto" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 focus:outline-none bg-pink-50/30 transition-all">
                     </div>
                 </div>
 
-                <div id="divDireccion" class="hidden animate-pulse">
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Si es a domicilio, ¿a dónde lo llevamos? 🏡</label>
-                    <input type="text" id="direccion" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none" placeholder="Dirección completa">
+                <div class="mt-8">
+                    <button type="button" onclick="validateAndNext(1, 2)" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        Siguiente: El Antojo 🍰
+                    </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">¿Qué día recibirlo? 📅 *</label>
-                    <input type="date" id="fecha" required class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none">
+            <div class="step" id="step2">
+                <div class="text-center mb-6">
+                    <span class="bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Paso 2 de 3</span>
+                    <h2 class="text-xl font-bold text-gray-800 mt-2">Personaliza tu dulce</h2>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">¿A qué hora? ⏰ *</label>
-                    <input type="time" id="hora" required class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">¿Qué producto deseas? 🧁 *</label>
+                        <select id="producto" data-required="true" onchange="checkOtros(this)" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 outline-none bg-pink-50/30">
+                            <option value="">Selecciona...</option>
+                            <option value="Cupcakes">Cupcakes</option>
+                            <option value="Tortas">Tortas</option>
+                            <option value="Fresas con crema">Fresas con crema</option>
+                            <option value="Fresas chocolatadas">Fresas chocolatadas</option>
+                            <option value="Otros">Otros (especificar abajo)</option>
+                        </select>
+                    </div>
+
+                    <div id="divOtros" class="hidden">
+                        <label class="block text-sm font-bold text-pink-600 mb-1">Especifica tu pedido 📝 *</label>
+                        <input type="text" id="otroProducto" placeholder="¿Qué dulce tienes en mente?" class="w-full px-4 py-3 border-2 border-pink-200 rounded-xl focus:border-pink-400 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Cantidad / Tamaño 📏 *</label>
+                        <input type="text" id="cantidad" data-required="true" placeholder="Ej: 12 unidades o 1 libra" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 outline-none bg-pink-50/30">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Sabor *</label>
+                            <select id="sabor" data-required="true" class="w-full px-3 py-2 border border-pink-100 rounded-lg outline-none bg-pink-50/30">
+                                <option value="">Elegir...</option>
+                                <option value="Vainilla">Vainilla</option>
+                                <option value="Chocolate">Chocolate</option>
+                                <option value="Red Velvet">Red Velvet</option>
+                                <option value="N/A">No aplica</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Relleno *</label>
+                            <select id="relleno" data-required="true" class="w-full px-3 py-2 border border-pink-100 rounded-lg outline-none bg-pink-50/30">
+                                <option value="">Elegir...</option>
+                                <option value="Sin relleno">Sin relleno</option>
+                                <option value="Mora">Mora</option>
+                                <option value="Arequipe">Arequipe</option>
+                                <option value="Chocolate">Chocolate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Color y Texto 🎨 *</label>
+                        <input type="text" id="colorYTexto" data-required="true" placeholder="Ej: Azul con nombre 'Luis'" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 outline-none bg-pink-50/30">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-8">
+                    <button type="button" onclick="goToStep(1)" class="w-1/3 bg-gray-100 text-gray-500 font-bold py-4 rounded-2xl">Atrás</button>
+                    <button type="button" onclick="validateAndNext(2, 3)" class="w-2/3 bg-pink-500 text-white font-bold py-4 rounded-2xl shadow-lg">Último paso ✨</button>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">¿Algo más que debamos tener en cuenta? 📝</label>
-                <textarea id="notas" rows="3" class="w-full px-4 py-2 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-400 focus:outline-none" placeholder="Alergias, colores, mensajes especiales..."></textarea>
+            <div class="step" id="step3">
+                <div class="text-center mb-6">
+                    <span class="bg-pink-100 text-pink-600 text-xs font-bold px-3 py-1 rounded-full uppercase">Paso 3 de 3</span>
+                    <h2 class="text-xl font-bold text-gray-800 mt-2">Finalizar Pedido</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex bg-pink-50/50 p-2 rounded-2xl gap-2 border border-pink-100">
+                        <label class="flex-1 text-center py-2 rounded-xl cursor-pointer transition-all has-[:checked]:bg-white has-[:checked]:shadow-sm has-[:checked]:text-pink-600 text-gray-400 font-bold">
+                            <input type="radio" name="entrega" value="Personalmente" class="hidden" checked onchange="toggleDir(false)"> Recojo
+                        </label>
+                        <label class="flex-1 text-center py-2 rounded-xl cursor-pointer transition-all has-[:checked]:bg-white has-[:checked]:shadow-sm has-[:checked]:text-pink-600 text-gray-400 font-bold">
+                            <input type="radio" name="entrega" value="Domicilio" class="hidden" onchange="toggleDir(true)"> Domicilio
+                        </label>
+                    </div>
+
+                    <div id="divDireccion" class="hidden">
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Dirección de entrega 🏡 *</label>
+                        <input type="text" id="direccion" placeholder="Barrio y dirección" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl focus:border-pink-300 outline-none bg-pink-50/30">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Fecha 📅 *</label>
+                            <input type="date" id="fecha" data-required="true" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl outline-none bg-pink-50/30">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">Hora ⏰ *</label>
+                            <input type="time" id="hora" data-required="true" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl outline-none bg-pink-50/30">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Forma de Pago 💳 *</label>
+                        <select id="pago" data-required="true" class="w-full px-4 py-3 border-2 border-pink-50 rounded-xl outline-none bg-pink-50/30 font-bold text-pink-600">
+                            <option value="Nequi">Nequi</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Daviplata">Daviplata</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-8">
+                    <button type="button" onclick="goToStep(2)" class="w-1/3 bg-gray-100 text-gray-500 font-bold py-4 rounded-2xl">Atrás</button>
+                    <button type="submit" class="w-2/3 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+                        Enviar a WhatsApp 🚀
+                    </button>
+                </div>
             </div>
 
-            <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2">
-                Enviar pedido por WhatsApp 🚀
-            </button>
         </form>
     </div>
 
     <script>
-        // Lógica para mostrar/ocultar dirección
-        const radioDomicilio = document.querySelectorAll('input[name="entrega"]');
-        const divDireccion = document.getElementById('divDireccion');
+        // Configuración básica para SweetAlert
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
 
-        radioDomicilio.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if(e.target.value === 'Domicilio') {
-                    divDireccion.classList.remove('hidden');
+        function checkOtros(select) {
+            const divOtros = document.getElementById('divOtros');
+            divOtros.classList.toggle('hidden', select.value !== 'Otros');
+        }
+
+        function toggleDir(show) {
+            const dirInput = document.getElementById('direccion');
+            document.getElementById('divDireccion').classList.toggle('hidden', !show);
+            if(show) dirInput.setAttribute('data-required', 'true');
+            else dirInput.removeAttribute('data-required');
+        }
+
+        function validateAndNext(currentStep, next) {
+            const stepDiv = document.getElementById('step' + currentStep);
+            const inputs = stepDiv.querySelectorAll('[data-required="true"]');
+            let valid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('error-field');
+                    valid = false;
                 } else {
-                    divDireccion.classList.add('hidden');
+                    input.classList.remove('error-field');
+                }
+            });
+
+            // Validar "Otros" específicamente
+            if (currentStep === 2 && document.getElementById('producto').value === 'Otros') {
+                const otroInput = document.getElementById('otroProducto');
+                if (!otroInput.value.trim()) {
+                    otroInput.classList.add('error-field');
+                    valid = false;
+                }
+            }
+
+            if (!valid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Ups!',
+                    text: 'Faltan campos por completar para seguir con tu pedido 💕',
+                    confirmButtonColor: '#ec4899'
+                });
+                return;
+            }
+
+            goToStep(next);
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + step).classList.add('active');
+            const progress = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar paso final
+            const inputs = document.getElementById('step3').querySelectorAll('[data-required="true"]');
+            let valid = true;
+            inputs.forEach(i => {
+                if(!i.value.trim()) { i.classList.add('error-field'); valid = false; }
+            });
+
+            if(!valid) {
+                Swal.fire({ icon: 'error', title: 'Casi listo...', text: 'Por favor indica la fecha y hora de entrega.' });
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Confirmas tu pedido?',
+                text: "Serás redirigido a WhatsApp para finalizar la compra.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '¡Sí, pedir ahora!',
+                cancelButtonText: 'Revisar datos',
+                confirmButtonColor: '#ec4899',
+                cancelButtonColor: '#9ca3af'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    enviarWhatsApp();
                 }
             });
         });
 
-        // Lógica del Formulario
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // REEMPLAZA ESTE NÚMERO CON EL TUYO
-            const MI_TELEFONO = "573225882932"; // Código país + número
-
-            const nombre = document.getElementById('nombre').value;
-            const whatsapp = document.getElementById('whatsapp').value;
-            const entrega = document.querySelector('input[name="entrega"]:checked').value;
-            const direccion = document.getElementById('direccion').value || "N/A";
-            const fecha = document.getElementById('fecha').value;
-            const hora = document.getElementById('hora').value;
-            const notas = document.getElementById('notas').value || "Ninguna";
-
-            // Armar el mensaje de WhatsApp
-            const mensaje = `*NUEVO PEDIDO: ARMA TU ANTOJO *\n\n` +
-                            `*Nombre:* ${nombre}\n` +
-                            `*Contacto:* ${whatsapp}\n` +
-                            `*Entrega:* ${entrega}\n` +
-                            (entrega === 'Domicilio' ? `*Dirección:* ${direccion}\n` : '') +
-                            `*Fecha:* ${fecha}\n` +
-                            `*Hora:* ${hora}\n` +
-                            `*Notas:* ${notas}`;
-
-            const url = `https://wa.me/${MI_TELEFONO}?text=${encodeURIComponent(mensaje)}`;
+        function enviarWhatsApp() {
+            const MI_TELEFONO = "573225882932";
             
-            window.open(url, '_blank');
-        });
+            const productoFinal = document.getElementById('producto').value === 'Otros' 
+                ? document.getElementById('otroProducto').value 
+                : document.getElementById('producto').value;
+
+            const datos = {
+                nombre: document.getElementById('nombre').value,
+                whatsapp: document.getElementById('whatsapp').value,
+                producto: productoFinal,
+                cantidad: document.getElementById('cantidad').value,
+                sabor: document.getElementById('sabor').value,
+                relleno: document.getElementById('relleno').value,
+                colorTexto: document.getElementById('colorYTexto').value,
+                entrega: document.querySelector('input[name="entrega"]:checked').value,
+                direccion: document.getElementById('direccion').value || "N/A",
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                pago: document.getElementById('pago').value
+            };
+
+            const mensaje = `*🧁 NUEVO PEDIDO: ARMA TU ANTOJO *\n\n` +
+                `*👤 CLIENTE:* ${datos.nombre}\n` +
+                `*📱 WHATSAPP:* ${datos.whatsapp}\n\n` +
+                `*🛒 PRODUCTO:* ${datos.producto}\n` +
+                `*📏 TAMAÑO:* ${datos.cantidad}\n` +
+                `*🍰 SABOR:* ${datos.sabor} / *RELLENO:* ${datos.relleno}\n` +
+                `*✍️ DETALLES:* ${datos.colorTexto}\n\n` +
+                `*🚚 ENTREGA:* ${datos.entrega}\n` +
+                (datos.entrega === 'Domicilio' ? `*🏡 DIR:* ${datos.direccion}\n` : '') +
+                `*📅 FECHA:* ${datos.fecha}\n` +
+                `*⏰ HORA:* ${datos.hora}\n` +
+                `*💳 PAGO:* ${datos.pago}`;
+
+            window.open(`https://wa.me/${MI_TELEFONO}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
     </script>
 </body>
 </html>
